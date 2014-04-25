@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <controller/layoutmanager.h>
 #include "controller/action.h"
+#include "controller/gamewindow.h"
 #include <QDebug>
 #include <QMap>
 
@@ -26,14 +27,13 @@ private:
     Ui::D3Helper *ui;
     LayoutManager manager;
     QMap<int,Action*> actions;
+    POINT mousePos;
 
 private Q_SLOTS:
-    void buttonChosen(int);
     void enabledClicked(bool);
-    void shiftClicked(bool);
-    void delayChanged(QString);
     void addButtonClicked();
     void removeButtonClicked();
+    void saveCursorPos();
 };
 
 #endif // D3HELPER_H

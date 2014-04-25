@@ -1,6 +1,7 @@
 #include "action.h"
 
 #include <QDebug>
+#include "controller/gamewindow.h"
 
 Action::Action(Key key, int delay) {
     this->key = key;
@@ -22,9 +23,16 @@ void Action::setFinish(bool finish) {
 void Action::run() {
 
     while(!finish) {
-        qDebug() << key.getKeyName();
+        delay = delay == 0 ? 100 : delay;
+        GameWindow::simulateClick(key,shiftClicked,pos);
         msleep(delay);
     }
+}
 
-    qDebug() << "Finish";
+void Action::setShift(bool click) {
+    this->shiftClicked = click;
+}
+
+void Action::setMousePos(POINT p) {
+    this->pos = p;
 }

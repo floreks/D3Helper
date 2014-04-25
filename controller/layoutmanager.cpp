@@ -122,6 +122,7 @@ QLineEdit* LayoutManager::copyLineEdit(QObject *obj) {
     QLineEdit *oldLineEdit = qobject_cast<QLineEdit*>(obj);
     QLineEdit *lineEdit = new QLineEdit();
 
+    lineEdit->setText("500");
     lineEdit->setObjectName(oldLineEdit->objectName() + " " + QString::number(keyLayouts.size()));
     return lineEdit;
 }

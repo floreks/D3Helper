@@ -3,6 +3,8 @@
 
 #include "controller/keyhelper.h"
 #include <QVariant>
+#include <QShortcut>
+#include <QMouseEvent>
 
 D3Helper::D3Helper(QWidget *parent) :
     QMainWindow(parent),
@@ -13,14 +15,19 @@ D3Helper::D3Helper(QWidget *parent) :
     this->setBaseSize(this->size());
 
     // Connect slots
-    connect(ui->buttonComboBox,SIGNAL(activated(int)),this,SLOT(buttonChosen(int)));
     connect(ui->addButton,SIGNAL(clicked()),this,SLOT(addButtonClicked()));
     connect(ui->removeButton,SIGNAL(clicked()),this,SLOT(removeButtonClicked()));
     connect(ui->enabledCheckBox,SIGNAL(clicked(bool)),this,SLOT(enabledClicked(bool)));
-    connect(ui->shiftCheckBox,SIGNAL(clicked(bool)),this,SLOT(shiftClicked(bool)));
-    connect(ui->delayLineEdit,SIGNAL(textEdited(QString)),this,SLOT(delayChanged(QString)));
+    QShortcut *cursorCheck = new QShortcut(QKeySequence("SHIFT+F1"),this);
+    connect(cursorCheck,SIGNAL(activated()),this,SLOT(saveCursorPos()));
 
     initialize();
+
+    if(GameWindow::setWindowName("Diablo III")) {
+        ui->statusBar->showMessage("Diablo III window found.",3000);
+    } else {
+        ui->statusBar->showMessage("ERROR: No game window found.",3000);
+    }
 }
 
 D3Helper::~D3Helper()
@@ -43,18 +50,9 @@ void D3Helper::initialize() {
 
 void D3Helper::connectWidgets(QList<QWidget*> widgets) {
     for(QObject *obj : widgets) {
-        if(obj->objectName().contains("lineedit",Qt::CaseInsensitive)) {
-            QLineEdit *lineEdit = qobject_cast<QLineEdit*>(obj);
-            connect(lineEdit,SIGNAL(textEdited(QString)),this,SLOT(delayChanged(QString)));
-        } else if(obj->objectName().contains("enabledcheckbox",Qt::CaseInsensitive)) {
+        if(obj->objectName().contains("enabledcheckbox",Qt::CaseInsensitive)) {
             QCheckBox *checkBox = qobject_cast<QCheckBox*>(obj);
             connect(checkBox,SIGNAL(clicked(bool)),this,SLOT(enabledClicked(bool)));
-        } else if(obj->objectName().contains("shiftcheckbox",Qt::CaseInsensitive)) {
-            QCheckBox *checkBox = qobject_cast<QCheckBox*>(obj);
-            connect(checkBox,SIGNAL(clicked(bool)),this,SLOT(shiftClicked(bool)));
-        } else if(obj->objectName().contains("combobox",Qt::CaseInsensitive)) {
-            QComboBox *comboBox = qobject_cast<QComboBox*>(obj);
-            connect(comboBox,SIGNAL(activated(int)),this,SLOT(buttonChosen(int)));
         }
     }
 }
@@ -84,30 +82,35 @@ void D3Helper::enabledClicked(bool isChecked) {
     if(toSplit.size() > 1) {
         boxNr = toSplit[1].toInt();
     }
+    QComboBox *box = manager.getComboBoxAt(boxNr);
+    QLineEdit *line = manager.getLineBoxAt(boxNr);
+    QCheckBox *checkBox = manager.getShiftBoxAt(boxNr);
 
     if(isChecked) {
-        QComboBox *box = manager.getComboBoxAt(boxNr);
-        QLineEdit *line = manager.getLineBoxAt(boxNr);
-        QCheckBox *shift = manager.getShiftBoxAt(boxNr);
         Key key = box->currentData().value<Key>();
         int delay = line->text().toInt();
 
         actions.insert(boxNr,new Action(key,delay));
+        actions.find(boxNr).value()->setShift(checkBox->isChecked());
         actions.find(boxNr).value()->start();
+
+        box->setEnabled(false);
+        line->setEnabled(false);
+        checkBox->setEnabled(false);
     } else {
+        box->setEnabled(true);
+        line->setEnabled(true);
+        checkBox->setEnabled(true);
         actions.find(boxNr).value()->setFinish(true);
         actions.remove(boxNr);
     }
 }
 
-void D3Helper::shiftClicked(bool isChecked) {
-    qDebug() << QObject::sender()->objectName();
-}
+void D3Helper::saveCursorPos() {
+    GetCursorPos(&mousePos);
+    ui->statusBar->showMessage("Mouse captured at X: " + QString::number(mousePos.x) + " Y: " + QString::number(mousePos.y));
 
-void D3Helper::delayChanged(QString delayString) {
-    qDebug() << QObject::sender()->objectName();
-}
-
-void D3Helper::buttonChosen(int i) {
-    qDebug() << QObject::sender()->objectName();
+    foreach(Action *action , actions) {
+        action->setMousePos(mousePos);
+    }
 }

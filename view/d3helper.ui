@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
+    <width>537</width>
     <height>125</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="addButton">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>450</x>
       <y>10</y>
       <width>81</width>
       <height>31</height>
@@ -30,7 +30,7 @@
    <widget class="QPushButton" name="removeButton">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>450</x>
       <y>60</y>
       <width>81</width>
       <height>31</height>
@@ -45,7 +45,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>401</width>
+      <width>431</width>
       <height>41</height>
      </rect>
     </property>
@@ -68,7 +68,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="delayLineEdit"/>
+      <widget class="QLineEdit" name="delayLineEdit">
+       <property name="text">
+        <string>500</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="shiftCheckBox">
@@ -93,7 +97,11 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="toolTipDuration">
+    <number>3</number>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
